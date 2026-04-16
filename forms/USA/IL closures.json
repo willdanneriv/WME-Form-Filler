@@ -1,0 +1,20 @@
+{
+    "name": "IL closures",
+    "url": "https://docs.google.com/forms/d/e/1FAIpQLSff7nsBw8qxCojBdxrjTPl6tercqyyzGy92Vif_SBdHkYDchw/viewform",
+    "url_with_keys": "https://docs.google.com/forms/d/e/1FAIpQLSff7nsBw8qxCojBdxrjTPl6tercqyyzGy92Vif_SBdHkYDchw/viewform?entry.1204781462=Reporter&entry.828228572=Reported&entry.1647952662=Street+name+&entry.1501712688=From+street+&entry.2094306654=To+street+&entry.1414240321=Two-Way&entry.900957975=10/27/2016+00:00&entry.1051351191=Adams&entry.1093044522=City+&entry.1540676081=IDOT&entry.430378754=Reason+&entry.1754051160=Permalink+&entry.172235277=Source+&entry.1722909714=Notes",
+    "fields": {
+        "username": "1204781462",
+        "closureStatus": "828228572",
+        "permalink": "1754051160",
+        "closedDir": "1414240321",
+        "closedReason": "430378754",
+        "endDate": "900957975",
+        "streetname": "1647952662",
+        "fromStreet": "1501712688",
+        "toStreet": "2094306654",
+        "county": "1051351191",
+        "city": "1093044522",
+        "source": "172235277",
+        "notes": "1722909714"
+    }
+}

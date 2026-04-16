@@ -1,0 +1,20 @@
+{
+    "name": "",
+    "url": "",
+    "url_with_keys": "",
+    "fields": {
+        "username": "",
+        "closureStatus": "",
+        "permalink": "",
+        "closedDir": "",
+        "closedReason": "",
+        "endDate": "",
+        "streetname": "",
+        "fromStreet": "",
+        "toStreet": "",
+        "stateabbr": "",
+        "county": "",
+        "source": "",
+        "notes": ""
+    }
+}
