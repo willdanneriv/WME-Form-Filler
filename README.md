@@ -1,3 +1,6 @@
+# ⚠️ WORK IN PROGRESS: SDK MIGRATION
+**Status:** Architecture overhaul. **DO NOT MERGE**
+
 # WME Form Filler
 
 This script uses information the WME DataModel to automatically fill out related forms for submission. 
