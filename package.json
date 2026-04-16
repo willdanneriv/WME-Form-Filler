@@ -1,0 +1,29 @@
+{
+  "name": "wme-form-filler",
+  "version": "2026.04.15.01",
+  "description": "",
+  "main": "dist/WME Form Filler.user.js",
+  "scripts": {
+    "dev": "node build.js --watch",
+    "build": "node build.js",
+    "build:pretty": "node build.js && prettier --write dist/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willdanneriv/WME-Form-Filler.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/willdanneriv/WME-Form-Filler/issues"
+  },
+  "homepage": "https://github.com/willdanneriv/WME-Form-Filler#readme",
+  "devDependencies": {
+    "@turf/turf": "^7.3.4",
+    "@types/node": "^25.6.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.2",
+    "wme-sdk-typings": "https://web-assets.waze.com/wme_sdk_docs/production/latest/wme-sdk-typings.tgz"
+  }
+}
