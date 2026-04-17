@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name         WME Form Filler (SDK)
+// @description  Use info from WME to automatically fill out related forms.
 // @namespace    https://greasyfork.org/users/6605
 // @version      2026.04.15.01
 // @description  Use info from WME to automatically fill out related forms.
@@ -7,13 +8,23 @@
 // @include      /^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor.*$/
 // @license      MIT
 // @grant        none
-// @require      https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js     
+// @require      https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js  
+// @require      https://cdn.jsdelivr.net/gh/willdanneriv/WME-Form-Filler@sdk-migration/forms/forms.js
 // @run-at       document-end
 // ==/UserScript==
 
 "use strict";
 (() => {
   // WME Form Filler.user.ts
+  var activeSelectionIds = [];
+  var capturedFormData = {
+    segmentIds: [],
+    streetName: [],
+    cityName: "",
+    stateName: "",
+    stateAbbr: "",
+    isReady: false
+  };
   var selectionSubscription = null;
   var WMEFFIcon = `
 <svg width="20" height="20" version="1.1" viewBox="0 0 8.4667 8.4667" xmlns="http://www.w3.org/2000/svg">
@@ -26,12 +37,17 @@
 </svg>`;
   var SCRIPT_NAME = GM_info.script.name;
   var wmeSDK;
+  function formfiller_log(message, level = "log", data = null) {
+    const msgPrefix = "[FormFiller]";
+    if (data) console[level](msgPrefix, message, data);
+    else console[level](msgPrefix, message);
+  }
   if (window.SDK_INITIALIZED) {
     window.SDK_INITIALIZED.then(bootstrap).catch((err) => {
-      console.error(`${SCRIPT_NAME}: SDK initialization failed`, err);
+      formfiller_log(`${SCRIPT_NAME}: SDK initialization failed`, "error", err);
     });
   } else {
-    console.warn(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`);
+    formfiller_log(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`, "warn");
   }
   function bootstrap() {
     try {
@@ -40,11 +56,11 @@
         scriptName: SCRIPT_NAME
       });
       wmeReady().then(() => {
-        console.log(`${SCRIPT_NAME}: All dependencies are ready.`);
+        formfiller_log(`${SCRIPT_NAME}: All dependencies are ready.`, "info");
         init();
       });
     } catch (error) {
-      console.error(`${SCRIPT_NAME}: Failed to initialize SDK`, error);
+      formfiller_log(`${SCRIPT_NAME}: Failed to initialize SDK`, "error", error);
     }
   }
   function wmeReady() {
@@ -82,7 +98,7 @@
     labelElement.style.color = "#606060";
   }
   async function init() {
-    console.log(`${SCRIPT_NAME}: Initializing...`);
+    formfiller_log(`${SCRIPT_NAME}: Initializing...`, "info");
     try {
       const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
       applyTabIcon(tabLabel);
@@ -101,63 +117,90 @@
             </div>
         `;
       tabPane.appendChild(settingsDiv);
-      console.log(`${SCRIPT_NAME}: Tab fully built and labeled.`);
+      formfiller_log(`${SCRIPT_NAME}: Tab fully built and labeled.`, "info");
       main();
     } catch (error) {
-      console.error(`${SCRIPT_NAME}: Error creating script tab`, error);
+      formfiller_log(`${SCRIPT_NAME}: Error creating script tab`, "error", error);
     }
   }
-  var capturedFormData = {
-    streetName: "",
-    cityName: "",
-    stateName: "",
-    segmentId: "",
-    isReady: false
-  };
-  var activeForms = [];
+  function abbrState(input, to) {
+    const statesData = window.ffFormData?.COUNTRIES?.USA?.STATES;
+    if (!statesData) {
+      formfiller_log("State data not found in ffFormData", "error");
+      return void 0;
+    }
+    const cleanInput = input.toUpperCase().trim();
+    if (to === "abbr") {
+      return Object.keys(statesData).find(
+        (key) => statesData[key].name?.toUpperCase() === cleanInput
+      );
+    } else {
+      return statesData[cleanInput]?.name;
+    }
+  }
   function main() {
-    console.log(`${SCRIPT_NAME}: Functional Logic Active.`);
-    const fetchForm = async (state) => {
-      const url = `https://cdn.jsdelivr.net/gh/willdanneriv/WME-Form-Filler@sdk-migration/forms/USA/${state}.json`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log(`[FormFiller] Successfully loaded ${state} configuration.`);
-        activeForms.push(data);
-        console.log("Forms in array:", activeForms.length);
-      } catch (err) {
-        console.error(`[FormFiller] Could not load ${state}:`, err);
+    formfiller_log(`${SCRIPT_NAME}: Functional Logic Active.`, "info");
+    const ffForms = window.ffFormData;
+    if (!ffForms) {
+      formfiller_log(`WME Form Filler: window.ffFormData is missing`, "error");
+      return;
+    }
+    formfiller_log("WME Form Filler: Data loaded successfully!", "info");
+    const usaStates = ffForms?.COUNTRIES?.USA?.STATES;
+    if (!usaStates) {
+      formfiller_log(`WME Form Filler: Path COUNTRIES.USA.STATES not found. Check casing in forms.js.`, "error");
+      formfiller_log("Current Data Structure:", "info", ffForms);
+      return;
+    }
+    Object.keys(usaStates).forEach((stateAbbr) => {
+      const stateData = usaStates[stateAbbr];
+      if (stateData && typeof stateData === "object") {
+        const keys = Object.keys(stateData);
+        formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", keys);
+      } else {
+        formfiller_log(`WME Form Filler: ${stateAbbr} has no valid form data.`, "warn");
       }
-    };
+    });
     selectionSubscription = wmeSDK.Events.on({
       eventName: "wme-selection-changed",
       eventHandler: () => {
         const selection = wmeSDK.Editing.getSelection();
         if (!selection || selection.objectType !== "segment" || selection.ids.length === 0) {
+          activeSelectionIds = [];
           capturedFormData.isReady = false;
-          console.log(`${SCRIPT_NAME}: Selection cleared.`);
           return;
         }
-        const segmentId = selection.ids[0];
-        const segment = wmeSDK.DataModel.Segments.getById({ segmentId });
-        if (segment) {
-          const streetId = segment.primaryStreetId || segment.primaryStreetId;
-          const street = wmeSDK.DataModel.Streets.getById({ streetId });
-          const city = street?.cityId ? wmeSDK.DataModel.Cities.getById({ cityId: street.cityId }) : null;
-          const state = city?.stateId ? wmeSDK.DataModel.States.getById({ stateId: city.stateId }) : null;
-          capturedFormData = {
-            segmentId: segmentId.toString(),
-            streetName: street?.name || "No Street Name",
-            cityName: city?.name || "No City",
-            stateName: state?.name || "",
-            isReady: true
-          };
-          console.log(`${SCRIPT_NAME}: Captured Data:`, capturedFormData);
-          const legacyInput = document.getElementById("ff-reason");
-          if (legacyInput) {
-            legacyInput.value = `Work on ${capturedFormData.streetName}`;
+        activeSelectionIds = selection.ids;
+        const uniqueStreets = /* @__PURE__ */ new Set();
+        let primaryState = "";
+        selection.ids.forEach((id) => {
+          const seg = wmeSDK.DataModel.Segments.getById({ segmentId: id });
+          if (seg) {
+            const streetId = seg.primaryStreetId;
+            const street = wmeSDK.DataModel.Streets.getById({ streetId });
+            if (street?.name) uniqueStreets.add(street.name);
+            let city = null;
+            if (street?.cityId != null) {
+              city = wmeSDK.DataModel.Cities.getById({ cityId: street.cityId });
+            }
+            let state = null;
+            if (city?.stateId != null) {
+              state = wmeSDK.DataModel.States.getById({ stateId: city.stateId });
+            }
+            if (state?.name && !primaryState) {
+              primaryState = state.name;
+            }
           }
-        }
+        });
+        capturedFormData = {
+          segmentIds: selection.ids.map((id) => id.toString()),
+          streetName: Array.from(uniqueStreets),
+          cityName: "",
+          stateName: primaryState,
+          stateAbbr: abbrState(primaryState, "abbr") || "",
+          isReady: true
+        };
+        formfiller_log(`Ready with ${activeSelectionIds.length} segments.`, "info");
       }
     });
   }

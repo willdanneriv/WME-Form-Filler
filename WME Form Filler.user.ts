@@ -9,6 +9,33 @@ declare global {
     }
 }
 
+// --- Interfaces ---
+
+/** * Data container that mimics what your legacy scraper used to collect.
+ * You can access this object when it's time to build your Form URL.
+ */
+interface CapturedFormData {
+    segmentIds: string[];
+    streetName: string[];
+    cityName: string;
+    stateName: string;
+    stateAbbr: string;
+    isReady: boolean;
+}
+
+// --- Global State Variables ---
+let activeForms: any[] = []; // This MUST be top-level (outside main)
+let activeSelectionIds: (string | number)[] = [];
+let capturedFormData: CapturedFormData = {
+    segmentIds: [],
+    streetName: [],
+    cityName: "",
+    stateName: "",
+    stateAbbr: "",
+    isReady: false
+};
+
+
 // These are provided by the WME environment/Tampermonkey
 declare const GM_info: any;
 declare const getWmeSdk: (config: { scriptId: string, scriptName: string }) => WmeSDK;
@@ -33,13 +60,28 @@ const WMEFFIcon = `
 const SCRIPT_NAME = GM_info.script.name;
 let wmeSDK: WmeSDK;
 
+/**
+ * Logs messages to the console with FormFiller prefix.
+ * @param {any} message - The text to log.
+ * @param {string} [level='log'] - The log level (log, warn, error)
+ * @param {object} [data] - Optional data to include.
+ * @since v.2026.04.15 (SDK Migration)
+ */
+function formfiller_log(message: any, level: 'log' | 'warn' | 'error' | 'info' = 'log', data: any = null) {
+    const msgPrefix = "[FormFiller]";
+
+    if (data) console[level](msgPrefix, message, data)
+    else console[level](msgPrefix, message)
+}
+
+
 // SDK Bootloader
 if ((window as any).SDK_INITIALIZED) {
     (window as any).SDK_INITIALIZED.then(bootstrap).catch((err: any) => {
-        console.error(`${SCRIPT_NAME}: SDK initialization failed`, err);
+        formfiller_log(`${SCRIPT_NAME}: SDK initialization failed`,"error", err);
     });
 } else {
-    console.warn(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`);
+    formfiller_log(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`,"warn");
 }
 
 /**
@@ -56,11 +98,11 @@ function bootstrap(): void {
         });
 
         wmeReady().then(() => {
-            console.log(`${SCRIPT_NAME}: All dependencies are ready.`);
+            formfiller_log(`${SCRIPT_NAME}: All dependencies are ready.`,"info");
             init();
         });
     } catch (error) {
-        console.error(`${SCRIPT_NAME}: Failed to initialize SDK`, error);
+        formfiller_log(`${SCRIPT_NAME}: Failed to initialize SDK`,"error", error);
     }
 }
 
@@ -123,7 +165,7 @@ function applyTabIcon(labelElement: HTMLElement): void {
  * @throws {Error} If the SDK sidebar registration fails.
  */
 async function init(): Promise<void> {
-    console.log(`${SCRIPT_NAME}: Initializing...`);
+    formfiller_log(`${SCRIPT_NAME}: Initializing...`,"info");
 
     try {
         // 1. Register with the SDK to get native Waze tab elements.
@@ -155,7 +197,7 @@ async function init(): Promise<void> {
         // 4. Append it to the pane provided by the SDK.
         tabPane.appendChild(settingsDiv);
 
-        console.log(`${SCRIPT_NAME}: Tab fully built and labeled.`);
+        formfiller_log(`${SCRIPT_NAME}: Tab fully built and labeled.`,"info");
 
         /** * Start the main logic (event listeners for selection, etc.)
          * @see {@link main}
@@ -163,32 +205,12 @@ async function init(): Promise<void> {
         main();
 
     } catch (error) {
-        console.error(`${SCRIPT_NAME}: Error creating script tab`, error);
+        formfiller_log(`${SCRIPT_NAME}: Error creating script tab`,"error", error);
     }
 }
 
-/** * Data container that mimics what your legacy scraper used to collect.
- * You can access this object when it's time to build your Form URL.
- */
-interface CapturedData {
-    segmentId: number;
-    streetId: number | null;
-    cityId: number | null;
-    stateId: number | null;
-    streetName: string;
-    isReady: boolean;
-}
-let capturedFormData = {
-    streetName: "",
-    cityName: "",
-    stateName: "",
-    segmentId: "",
-    isReady: false
-};
-
-let activeForms: any[] = []; // This MUST be top-level (outside main)
-
 const launchForm = (formData: any, prefilledUrl: string) => {
+    //FIXME
     const mode = ffUserSettings.displayMode; // 'sidebar' | 'tab' | 'window'
 
     switch (mode) {
@@ -215,73 +237,160 @@ const launchForm = (formData: any, prefilledUrl: string) => {
     }
 };
 
-function main() {
-    console.log(`${SCRIPT_NAME}: Functional Logic Active.`);
+/**
+ * Converts state names to abbreviations and vice versa using ffFormData.
+ * @param {string} input - The state name or abbreviation to convert.
+ * @param {'abbr' | 'name'} to - The target format.
+ */
+function abbrState(input: string, to: 'abbr' | 'name'): string | undefined {
+    const statesData = window.ffFormData?.COUNTRIES?.USA?.STATES;
+    if (!statesData) {
+        formfiller_log("State data not found in ffFormData", "error");
+        return undefined;
+    }
 
-    const ffForms = window.ffFormData;
+    const cleanInput = input.toUpperCase().trim();
+
+    if (to === 'abbr') {
+        // Find the KEY where the .name matches the input.
+        return Object.keys(statesData).find(
+            key => statesData[key].name?.toUpperCase() === cleanInput
+        );
+    } else {
+        // Direct lookup: return the .name property for the given key (e.g., statesData["IL"].name)
+        return statesData[cleanInput]?.name;
+    }
+}
+
+/**
+ * Gathers all forms available for a specific state.
+ * @param {string} stateAbbr - e.g., "IL" or "VA"
+ */
+function getFormsForState(stateAbbr: string) {
+    const stateData = window.ffFormData?.COUNTRIES?.USA?.STATES[stateAbbr];
+
+    if (!stateData) return [];
+
+    // Filter out the 'name' property so we only get the Form Objects
+    const formKeys = Object.keys(stateData).filter(key => key !== 'name');
+
+    return formKeys.map(key => {
+        return {
+            id: key, // e.g., "IL_Closures"
+            ...stateData[key] // The actual form data (url, fields, etc.)
+        };
+    });
+}
+
+/**
+ * Gathers all form keys available for the current location.
+ */
+function getAvailableFormKeys(countryCode: string, stateAbbr: string): string[] {
+    const countryData = window.ffFormData?.COUNTRIES?.[countryCode];
+    if (!countryData) return [];
+
+    const keys: string[] = [];
+
+    // 1. Get National Keys (e.g., JANE_TTS, VEOC_Closures)
+    Object.keys(countryData).forEach(key => {
+        if (key !== 'STATES') keys.push(key);
+    });
+
+    // 2. Get State Specific Keys (e.g., VA_Closures)
+    const stateData = countryData.STATES?.[stateAbbr];
+    if (stateData) {
+        Object.keys(stateData).forEach(key => {
+            if (key !== 'name') keys.push(key);
+        });
+    }
+
+    return keys;
+}
+
+function main() {
+    formfiller_log(`${SCRIPT_NAME}: Functional Logic Active.`, "info");
+
+    const ffForms = (window as any).ffFormData;
 
     if (!ffForms) {
-        console.error("WME Form Filler: Form data not found. Check @require links.");
+        formfiller_log(`WME Form Filler: window.ffFormData is missing`, "error");
         return;
     }
 
-    console.log("WME Form Filler: Data loaded successfully!");
+    formfiller_log("WME Form Filler: Data loaded successfully!", "info");
 
-    // 2. Example: Accessing the USA States
-    const usaStates = ffForms.COUNTRIES.USA.states;
-    
-    // 3. Build your UI (Dropdowns, Buttons, etc.)
-    Object.keys(usaStates).forEach(stateAbbr => {
+    const usaStates = ffForms?.COUNTRIES?.USA?.STATES;
+
+    if (!usaStates) {
+        formfiller_log(`WME Form Filler: Path COUNTRIES.USA.STATES not found. Check casing in forms.js.`, "error");
+        formfiller_log("Current Data Structure:", "info", ffForms); 
+        return;
+    }
+
+    // 1. Single, Guarded Loop for UI setup
+    Object.keys(usaStates).forEach((stateAbbr) => {
         const stateData = usaStates[stateAbbr];
-        // Here you would call your function to add these to the WME sidebar
-        console.log(`Setting up forms for ${stateAbbr}:`, Object.keys(stateData));
+
+        if (stateData && typeof stateData === 'object') {
+            const keys = Object.keys(stateData);
+            formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", keys);
+            
+            // This is where you will eventually call your button builder
+            // renderStateButtons(stateAbbr, keys);
+        } else {
+            formfiller_log(`WME Form Filler: ${stateAbbr} has no valid form data.`, "warn");
+        }
     });
 
+    // 2. The SDK Event Listener
     selectionSubscription = wmeSDK.Events.on({
         eventName: 'wme-selection-changed',
         eventHandler: () => {
             const selection = wmeSDK.Editing.getSelection();
 
-            // 1. Reset state if selection is empty or not a segment
             if (!selection || selection.objectType !== 'segment' || selection.ids.length === 0) {
+                activeSelectionIds = [];
                 capturedFormData.isReady = false;
-                console.log(`${SCRIPT_NAME}: Selection cleared.`);
                 return;
             }
 
-            // 2. Data Extraction (Replacing the old DOM scraping)
-            const segmentId = selection.ids[0];
-            const segment = wmeSDK.DataModel.Segments.getById({ segmentId });
+            activeSelectionIds = selection.ids;
+            const uniqueStreets = new Set<string>();
+            let primaryState = "";
 
-            if (segment) {
-                // 1. Use 'primaryStreetId' to satisfy the TypeScript compiler
-                const streetId = (segment as any).primaryStreetId || segment.primaryStreetId;
+            selection.ids.forEach(id => {
+                const seg = wmeSDK.DataModel.Segments.getById({ segmentId: id });
+                if (seg) {
+                    const streetId = (seg as any).primaryStreetId;
+                    const street = wmeSDK.DataModel.Streets.getById({ streetId });
+                    if (street?.name) uniqueStreets.add(street.name);
 
-                const street = wmeSDK.DataModel.Streets.getById({ streetId });
-                const city = street?.cityId
-                    ? wmeSDK.DataModel.Cities.getById({ cityId: street.cityId })
-                    : null;
-                const state = city?.stateId
-                    ? wmeSDK.DataModel.States.getById({ stateId: city.stateId })
-                    : null;
+                    let city = null;
+                    if (street?.cityId != null) {
+                        city = wmeSDK.DataModel.Cities.getById({ cityId: street.cityId });
+                    }
 
-                capturedFormData = {
-                    segmentId: segmentId.toString(),
-                    streetName: street?.name || "No Street Name",
-                    cityName: city?.name || "No City",
-                    stateName: state?.name || "",
-                    isReady: true
-                };
+                    let state = null;
+                    if (city?.stateId != null) {
+                        state = wmeSDK.DataModel.States.getById({ stateId: city.stateId });
+                    }
 
-                console.log(`${SCRIPT_NAME}: Captured Data:`, capturedFormData);
-
-                // 4. (Legacy Hook) 
-                // If your legacy code looked for an input box to fill immediately, do it here:
-                const legacyInput = document.getElementById('ff-reason') as HTMLInputElement;
-                if (legacyInput) {
-                    legacyInput.value = `Work on ${capturedFormData.streetName}`;
+                    if (state?.name && !primaryState) {
+                        primaryState = state.name;
+                    }
                 }
-            }
-        },
+            });
+
+            capturedFormData = {
+                segmentIds: selection.ids.map(id => id.toString()),
+                streetName: Array.from(uniqueStreets),
+                cityName: "", 
+                stateName: primaryState,
+                stateAbbr: abbrState(primaryState, 'abbr') || "",
+                isReady: true
+            };
+
+            formfiller_log(`Ready with ${activeSelectionIds.length} segments.`, "info");
+        }
     });
 }

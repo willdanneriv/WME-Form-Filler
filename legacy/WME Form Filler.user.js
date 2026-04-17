@@ -1,3 +1,8 @@
+/* ATTENTION: This file is for LEGACY REFERENCE ONLY.
+  All active development has moved to ./WME Form Filler.user.js
+  as part of the SDK Migration (April 2026).
+*/
+
 // ==UserScript==
 // @name        WME Form Filler
 // @description Use info from WME to automatically fill out related forms
@@ -25,12 +30,16 @@
     /**
      * @constant WMEFFIcon
      * @description Base64 encoded PNG for the Form Filler tab icon.
-     * @deprecated April 2026: Moved to constant in src/index.ts.
+     * @deprecated April 2026: Moved to constant in WME Form Filler.user.js.
      * Now injected directly into the tabLabel element provided by the SDK. 
-     * Replaced by path-based SVG in src/index.ts for a 95% reduction in asset size.
+     * Replaced by path-based SVG in WME Form Filler.user.js for a 95% reduction in asset size.
      */
     // var WMEFFIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NUIzRDdFNzAwRTlGMTFFNkIyRDZGMzNERUFDMUM1NDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NUIzRDdFNzEwRTlGMTFFNkIyRDZGMzNERUFDMUM1NDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo1QjNEN0U2RTBFOUYxMUU2QjJENkYzM0RFQUMxQzU0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo1QjNEN0U2RjBFOUYxMUU2QjJENkYzM0RFQUMxQzU0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PtdrqLIAAAOCSURBVHjatJdLaBNBGMdn81ITQ2mLNqlIKInGkpSgFooPpKGHIlZPJqgoIvQivooPfFUsxYNVW62KiuItPah48RaUSlFEaDzEqgeV+sBUxag1rZa8Nv6nfMKaZpNssx34kdnN7sx/5nvNCtFolAUCAW8ymdwtCIKZMZZh6jQBjIIL4EkikWA+n485HI7/HtLFYjHH0NDQnXQ6XQkBbAbaGrAsHo+PNDc3T/lTF4lEVouiWKnX62O4DgBRpYn1YBuoAkuxwBGNRjNVAP7QZjKTu/4V7FJ59euAEWjlHtBg2//ZXEOq1WpzaUyWz690Ms5jUDhZcrqm0+UYyAPuKxyH2zqohgC++j/gmcJxRot5yGAwFBTAr9+AtWrHIqKMBYNBFgqFmlKpVLympuax1+udIiBD9reUON/nLMcTtFotC4fDBoR8H5JSVV1dXVdjY+OxbAEpUA8GSxRQC95KrkUe6jABzwnbkQ/OmUwmPSJQzBbAw+YL6C5hcr7y72TO2TTeI9AA7oErELNBp9NF5HzgEziogtnNZM6j4BfoAfNBB0XZu1wCuAkWggMKJ7sBXmbd4xmwH1wHW8FKut/Hi5NcFIiUu/cpFNCfQ0ACHKGdOM0LHbx/DE54HJWX92XDMEy7oKRFc9z7SXSBBZiYWSyWs0aj8QMvzVarVTYRJckP1GhLwN7J7Ugkhv1+f4/H48mbiPi+LOKeWmIUtIKP4AxFAiNn/F0oE/KX5wB3iQLSoAmsp3sPwW0q+3kF8HL8HFgVTqrJqvn8upf6XMyhYotRhsKnVqEAXj9ikuv9wEX9m/mKWy4fWA6eKhSwEdylfjVop/4PcEJJOebbOAz2KDgdC1kr7ATl1O+gUFwMXhcjgNvuG7g8TQdcAXZQ/xW4RLvxXk6ARmagBhqoTHJvFdhCUSLX2iVjttH7h8GEEh9wggEwiw4mfirRA2Sia2CnzHjV9HuLCs5FOpwmlERBGU3Om41+50nCzJ4nFCM0eTftlI/XAJ778WHCeDou5kg2SNtXLzkXPAAnKbWeymOCzWCM+nwRGT55S0sLs9lszG635xQgSCphivq9OU7LnQUcUJRMzts4T0JozOl0Ci6Xq6AJ+GHhPGUuNRo/jJRTGZbPAyiLIZzRJrBVZXi4bQY+TsfNZvMLWQEVFRVht9u9CQJaIcCk8uf5GArQVRxAh+Ue+ivAAAY7DIf3WTuXAAAAAElFTkSuQmCC";
 
+    /**
+     * @deprecated replaced by activeForms: []
+     * @see {@link activeForms} in WME Form Filler.user.js
+     */
     var forms = [];
 
     /**
@@ -38,7 +47,7 @@
     * @description Legacy polling function that checked for W.app and W.map availability.
     * @deprecated April 2026: Replaced by the Promise-based bootstrap and wmeReady 
     * sequence in the new TypeScript engine. 
-    * @see {@link bootstrap} in src/index.ts
+    * @see {@link bootstrap} in WME Form Filler.user.js
     */
     function formfiller_bootstrap() {
         formfiller_log("Legacy bootstrap disabled. Standing by for new SDK engine...");
@@ -62,9 +71,9 @@
      * @function formfiller_init
      * @description The original initialization routine. Handled UI injection, 
      * event listeners, and default settings.
-     * @deprecated April 2026: Replaced by the modular init() sequence in src/index.ts.
+     * @deprecated April 2026: Replaced by the modular init() sequence in WME Form Filler.user.js.
      * Logic is now split between Sidebar registration and Selection managers.
-     * @see {@link init} in src/index.ts
+     * @see {@link init} in WME Form Filler.user.js
      */
     function formfiller_init() {
         formfiller_log("Legacy init suppressed. New engine active.");
@@ -214,6 +223,12 @@
         }
     }
 
+    /**
+     * @deprecated Moved to the new SDK-migration branch.
+     * @see {@link ./WME-Form-Filler.user.js} for the modernized implementation.
+     * @reason Incorporated into new SDK compatable version.
+     * @see {@link formfiller_log} in WME Form Filler.user.js
+     */
     function formfiller_log(message) {
         if (typeof message === "string") {
             console.log("FormFiller: " + message);
@@ -222,6 +237,7 @@
         }
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getStreetName(selection) {
         var streetName = [],
             i;
@@ -238,6 +254,7 @@
         return streetName.join(", ");
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getState(selection) {
         var stateName = "",
             i;
@@ -265,6 +282,7 @@
         return stateName;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getCity(selection) {
         var cityName = "",
             i;
@@ -281,6 +299,7 @@
         return cityName;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getCounty(selection) {
         var county = "";
         // Disable county for now, currently broken
@@ -316,6 +335,7 @@
         return county;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_closureActive(selection) {
         var i;
         for (i = 0; i < selection.length; i += 1) {
@@ -328,6 +348,7 @@
         return false;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getClosureInfo(seg) {
         var closureInfo = {
             closedDir: "",
@@ -368,6 +389,7 @@
         return closureInfo;
     }
 
+// TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_createPermalink(selection) {
         //https://www.waze.com/editor/?env=usa&lon=-79.79248&lat=32.86150&layers=12709&zoom=5&mode=0&mapProblemFilter=1&mapUpdateRequestFilter=0&venueFilter=0&segments=504534141
         //https://www.waze.com/editor/?env=usa&lon=-79.79248&lat=32.86150&layers=12709&zoom=5&mode=0&mapProblemFilter=1&mapUpdateRequestFilter=0&venueFilter=0&venues=183632201.1836387542.3102948
@@ -425,6 +447,7 @@
         return permalink;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_getLastEditor(selection) {
         var eID;
         var editorNames = "";
@@ -446,6 +469,7 @@
         return editorNames;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_createFormLink(formSel) {
         var selection = W.selectionManager.getSelectedFeatures();
         var formValues = {};
@@ -539,6 +563,7 @@
         return formLink;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_addFormBtn() {
         var selection = W.selectionManager.getSelectedFeatures();
         var ffDiv = document.createElement("div"),
@@ -558,10 +583,10 @@
         }
 
         /**
-         * @deprecated This inline array is replaced by the centralized JSON files 
-         * located in the `/forms` directory. Use the dynamic import system instead.
+         * @deprecated This inline array is replaced by a centralized JS file 
+         * located in the `/forms` directory. Uses a Tampermonkey "@require" import system instead.
          * * Historical Reference: This was the original form mapping used before 
-         * the SDK migration and JSON externalization.
+         * the SDK migration and JS object creation.
          */
 
         forms = [{
@@ -742,6 +767,7 @@
         return;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_loadSettings() {
         var todayDate = new Date(),
             futureDate = new Date(),
@@ -772,6 +798,7 @@
         return;
     }
 
+    // TODO(willdanneriv): Move to SDK Migration File. Update for SDK compatibility
     function ff_saveSettings() {
         if ($("#ff-open-in-tab").prop("checked")) {
             localStorage.setItem("ff-open-in-tab", "1");
@@ -789,9 +816,9 @@
     * @function ff_addUserTab
     * @description Manually creates a new sidebar tab using jQuery and DOM injection.
     * @deprecated April 2026: Replaced by async wmeSDK.Sidebar.registerScriptTab() 
-    * in src/index.ts. The new method uses the official SDK containers to prevent 
+    * in WME Form Filler.user.js. The new method uses the official SDK containers to prevent 
     * UI breakage during WME updates.
-    * @see {@link init} in src/index.ts
+    * @see {@link init} in WME Form Filler.user.js
     */
     function ff_addUserTab() {
         formfiller_log("Legacy UI injection bypassed.");
@@ -880,5 +907,10 @@
         });
     }
 
+    /**
+     * @deprecated April 2026: Replaced by the Promise-based bootstrap and wmeReady 
+     * sequence in the new TypeScript engine. 
+     * @see {@link bootstrap} in WME Form Filler.user.js
+     */
     setTimeout(formfiller_bootstrap, 2000);
 }());

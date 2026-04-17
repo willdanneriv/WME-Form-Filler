@@ -2,6 +2,7 @@ const esbuild = require('esbuild');
 
 const metadata = `// ==UserScript==
 // @name         WME Form Filler (SDK)
+// @description  Use info from WME to automatically fill out related forms.
 // @namespace    https://greasyfork.org/users/6605
 // @version      ${require('./package.json').version}
 // @description  Use info from WME to automatically fill out related forms.
