@@ -103,20 +103,30 @@
       const { tabLabel, tabPane } = await wmeSDK.Sidebar.registerScriptTab();
       applyTabIcon(tabLabel);
       tabLabel.title = "WME Form Filler";
-      const settingsDiv = document.createElement("div");
-      settingsDiv.id = "ff-settings-root";
-      settingsDiv.style.padding = "16px";
-      settingsDiv.innerHTML = `
+      const headerDiv = document.createElement("div");
+      headerDiv.id = "ff-header";
+      headerDiv.style.padding = "16px";
+      headerDiv.innerHTML = `
             <h4 style="font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 8px; color: black;">
-                Form Filler Settings
+                Form Filler
             </h4>
-            <div style="margin-top: 15px;">
-                <label style="display: block; font-size: 12px; color: #666;">Closure Reason</label>
-                <input type="text" id="ff-reason" placeholder="Construction"
-                       style="width: 100%; border: 1px solid #ccc; padding: 8px; color: #000; background: white;">
-            </div>
         `;
-      tabPane.appendChild(settingsDiv);
+      tabPane.appendChild(headerDiv);
+      const settingsSection = document.createElement("div");
+      settingsSection.id = "ff-settings-section";
+      settingsSection.innerHTML = `
+            <h4 style="margin-bottom:10px;">Settings</h4>
+            <div style="margin-top: 15px; margin-right: 5px">
+                <label style="display: block; font-size: 12px; color: #666;" > Closure Reason </label>
+                <input type = "text" id = "ff-reason" placeholder = "Construction" style = "width: 100%; border: 1px solid #ccc; padding: 8px; color: #000; background: white;"
+            </div>`;
+      settingsSection.style.paddingBottom = "15px";
+      settingsSection.style.borderBottom = "1px solid #ccc";
+      tabPane.appendChild(settingsSection);
+      const formsSection = document.createElement("div");
+      formsSection.id = "ff-forms-section";
+      formsSection.innerHTML = '<h4 style="margin-top:15px;">Available Forms</h4>';
+      tabPane.appendChild(formsSection);
       formfiller_log(`${SCRIPT_NAME}: Tab fully built and labeled.`, "info");
       main();
     } catch (error) {
@@ -155,8 +165,32 @@
     Object.keys(usaStates).forEach((stateAbbr) => {
       const stateData = usaStates[stateAbbr];
       if (stateData && typeof stateData === "object") {
-        const keys = Object.keys(stateData);
-        formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", keys);
+        const formKeys = Object.keys(stateData).filter((key) => key !== "name");
+        const container = document.getElementById("ff-forms-section");
+        formKeys.forEach((formKey) => {
+          const btn = document.createElement("button");
+          btn.innerText = `${stateAbbr}: ${formKey.replace("_", " ")}`;
+          Object.assign(btn.style, {
+            width: "100%",
+            margin: "5px 0",
+            padding: "8px",
+            backgroundColor: "#62ad00",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          });
+          btn.onclick = () => {
+            if (!capturedFormData.isReady) {
+              alert("Please select segments on the map first!");
+              return;
+            }
+            formfiller_log(`Launching ${formKey} for ${stateAbbr}. Segments: ${capturedFormData.segmentIds.length}`);
+          };
+          container?.appendChild(btn);
+        });
+        formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", formKeys);
       } else {
         formfiller_log(`WME Form Filler: ${stateAbbr} has no valid form data.`, "warn");
       }

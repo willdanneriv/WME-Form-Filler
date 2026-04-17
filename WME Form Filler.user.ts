@@ -78,10 +78,10 @@ function formfiller_log(message: any, level: 'log' | 'warn' | 'error' | 'info' =
 // SDK Bootloader
 if ((window as any).SDK_INITIALIZED) {
     (window as any).SDK_INITIALIZED.then(bootstrap).catch((err: any) => {
-        formfiller_log(`${SCRIPT_NAME}: SDK initialization failed`,"error", err);
+        formfiller_log(`${SCRIPT_NAME}: SDK initialization failed`, "error", err);
     });
 } else {
-    formfiller_log(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`,"warn");
+    formfiller_log(`${SCRIPT_NAME}: SDK_INITIALIZED is undefined`, "warn");
 }
 
 /**
@@ -98,11 +98,11 @@ function bootstrap(): void {
         });
 
         wmeReady().then(() => {
-            formfiller_log(`${SCRIPT_NAME}: All dependencies are ready.`,"info");
+            formfiller_log(`${SCRIPT_NAME}: All dependencies are ready.`, "info");
             init();
         });
     } catch (error) {
-        formfiller_log(`${SCRIPT_NAME}: Failed to initialize SDK`,"error", error);
+        formfiller_log(`${SCRIPT_NAME}: Failed to initialize SDK`, "error", error);
     }
 }
 
@@ -165,7 +165,7 @@ function applyTabIcon(labelElement: HTMLElement): void {
  * @throws {Error} If the SDK sidebar registration fails.
  */
 async function init(): Promise<void> {
-    formfiller_log(`${SCRIPT_NAME}: Initializing...`,"info");
+    formfiller_log(`${SCRIPT_NAME}: Initializing...`, "info");
 
     try {
         // 1. Register with the SDK to get native Waze tab elements.
@@ -177,27 +177,38 @@ async function init(): Promise<void> {
         applyTabIcon(tabLabel)
         tabLabel.title = 'WME Form Filler';
 
-        /** * 3. Settings Container Creation
-         * Building the root element for the script's settings panel.
-         */
-        const settingsDiv = document.createElement('div');
-        settingsDiv.id = 'ff-settings-root';
-        settingsDiv.style.padding = '16px';
-        settingsDiv.innerHTML = `
+        // Header Container Creation
+        const headerDiv = document.createElement('div');
+        headerDiv.id = 'ff-header';
+        headerDiv.style.padding = '16px';
+        headerDiv.innerHTML = `
             <h4 style="font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 8px; color: black;">
-                Form Filler Settings
+                Form Filler
             </h4>
-            <div style="margin-top: 15px;">
-                <label style="display: block; font-size: 12px; color: #666;">Closure Reason</label>
-                <input type="text" id="ff-reason" placeholder="Construction"
-                       style="width: 100%; border: 1px solid #ccc; padding: 8px; color: #000; background: white;">
-            </div>
         `;
+        // Append header to pane.
+        tabPane.appendChild(headerDiv);
 
-        // 4. Append it to the pane provided by the SDK.
-        tabPane.appendChild(settingsDiv);
+        // Settings Section Creation
+        const settingsSection = document.createElement('div');
+        settingsSection.id = 'ff-settings-section';
+        settingsSection.innerHTML = `
+            <h4 style="margin-bottom:10px;">Settings</h4>
+            <div style="margin-top: 15px; margin-right: 5px">
+                <label style="display: block; font-size: 12px; color: #666;" > Closure Reason </label>
+                <input type = "text" id = "ff-reason" placeholder = "Construction" style = "width: 100%; border: 1px solid #ccc; padding: 8px; color: #000; background: white;"
+            </div>`
+        settingsSection.style.paddingBottom = '15px';
+        settingsSection.style.borderBottom = '1px solid #ccc';
+        tabPane.appendChild(settingsSection);
 
-        formfiller_log(`${SCRIPT_NAME}: Tab fully built and labeled.`,"info");
+        // 2. Forms Section Creation
+        const formsSection = document.createElement('div');
+        formsSection.id = 'ff-forms-section';
+        formsSection.innerHTML = '<h4 style="margin-top:15px;">Available Forms</h4>';
+        tabPane.appendChild(formsSection);
+
+        formfiller_log(`${SCRIPT_NAME}: Tab fully built and labeled.`, "info");
 
         /** * Start the main logic (event listeners for selection, etc.)
          * @see {@link main}
@@ -205,7 +216,7 @@ async function init(): Promise<void> {
         main();
 
     } catch (error) {
-        formfiller_log(`${SCRIPT_NAME}: Error creating script tab`,"error", error);
+        formfiller_log(`${SCRIPT_NAME}: Error creating script tab`, "error", error);
     }
 }
 
@@ -307,6 +318,7 @@ function getAvailableFormKeys(countryCode: string, stateAbbr: string): string[] 
     return keys;
 }
 
+
 function main() {
     formfiller_log(`${SCRIPT_NAME}: Functional Logic Active.`, "info");
 
@@ -323,7 +335,7 @@ function main() {
 
     if (!usaStates) {
         formfiller_log(`WME Form Filler: Path COUNTRIES.USA.STATES not found. Check casing in forms.js.`, "error");
-        formfiller_log("Current Data Structure:", "info", ffForms); 
+        formfiller_log("Current Data Structure:", "info", ffForms);
         return;
     }
 
@@ -332,17 +344,47 @@ function main() {
         const stateData = usaStates[stateAbbr];
 
         if (stateData && typeof stateData === 'object') {
-            const keys = Object.keys(stateData);
-            formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", keys);
+            const formKeys = Object.keys(stateData).filter(key => key !== 'name');
             
-            // This is where you will eventually call your button builder
-            // renderStateButtons(stateAbbr, keys);
+            // Reference the container we made in init()
+            const container = document.getElementById('ff-forms-section');
+
+            formKeys.forEach(formKey => {
+                const btn = document.createElement('button');
+                btn.innerText = `${stateAbbr}: ${formKey.replace('_', ' ')}`;
+                
+                // Styling to fit the WME vibe
+                Object.assign(btn.style, {
+                    width: '100%',
+                    margin: '5px 0',
+                    padding: '8px',
+                    backgroundColor: '#62ad00',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                });
+
+                btn.onclick = () => {
+                    if (!capturedFormData.isReady) {
+                        alert("Please select segments on the map first!");
+                        return;
+                    }
+                    formfiller_log(`Launching ${formKey} for ${stateAbbr}. Segments: ${capturedFormData.segmentIds.length}`);
+                    // Next step: buildUrl(stateData[formKey], capturedFormData);
+                };
+
+                container?.appendChild(btn);
+            });
+            
+            formfiller_log(`Setting up forms for ${stateAbbr}:`, "info", formKeys);
         } else {
             formfiller_log(`WME Form Filler: ${stateAbbr} has no valid form data.`, "warn");
         }
     });
 
-    // 2. The SDK Event Listener
+    // Selection Event Listener (SDK)
     selectionSubscription = wmeSDK.Events.on({
         eventName: 'wme-selection-changed',
         eventHandler: () => {
@@ -384,7 +426,7 @@ function main() {
             capturedFormData = {
                 segmentIds: selection.ids.map(id => id.toString()),
                 streetName: Array.from(uniqueStreets),
-                cityName: "", 
+                cityName: "",
                 stateName: primaryState,
                 stateAbbr: abbrState(primaryState, 'abbr') || "",
                 isReady: true
