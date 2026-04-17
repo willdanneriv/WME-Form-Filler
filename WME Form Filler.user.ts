@@ -2,6 +2,13 @@ import { WmeSDK } from "wme-sdk-typings";
 import type * as TurfType from '@turf/turf';
 declare const turf: typeof TurfType;
 
+// Declare global Window variables
+declare global {
+    interface Window {
+        ffFormData: any;
+    }
+}
+
 // These are provided by the WME environment/Tampermonkey
 declare const GM_info: any;
 declare const getWmeSdk: (config: { scriptId: string, scriptName: string }) => WmeSDK;
@@ -85,7 +92,7 @@ function applyTabIcon(labelElement: HTMLElement): void {
         tabButton.style.setProperty('background', 'transparent', 'important');
         tabButton.style.setProperty('border', 'none', 'important');
         tabButton.style.setProperty('box-shadow', 'none', 'important');
-        
+
         // Ensure the button itself allows centering
         tabButton.style.display = 'flex';
         tabButton.style.alignItems = 'center';
@@ -104,7 +111,7 @@ function applyTabIcon(labelElement: HTMLElement): void {
     });
 
     labelElement.innerHTML = WMEFFIcon;
-    labelElement.style.color = '#606060'; 
+    labelElement.style.color = '#606060';
 }
 
 /**
@@ -179,8 +186,56 @@ let capturedFormData = {
     isReady: false
 };
 
+let activeForms: any[] = []; // This MUST be top-level (outside main)
+
+const launchForm = (formData: any, prefilledUrl: string) => {
+    const mode = ffUserSettings.displayMode; // 'sidebar' | 'tab' | 'window'
+
+    switch (mode) {
+        case 'sidebar':
+            // Inject iframe into your custom WME Sidebar tab
+            const container = document.getElementById('wme-form-filler-tab');
+            if (container) {
+                container.innerHTML = `<iframe src="${prefilledUrl}&embedded=true" style="width:100%; height:100vh; border:none;"></iframe>`;
+            }
+            break;
+
+        case 'tab':
+            // The classic "New Tab" behavior
+            window.open(prefilledUrl, '_blank');
+            break;
+
+        case 'window':
+            // A dedicated popup window (cleaner than a full tab)
+            const width = 600, height = 800;
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+            window.open(prefilledUrl, 'FormFiller', `width=${width},height=${height},top=${top},left=${left}`);
+            break;
+    }
+};
+
 function main() {
     console.log(`${SCRIPT_NAME}: Functional Logic Active.`);
+
+    const ffForms = window.ffFormData;
+
+    if (!ffForms) {
+        console.error("WME Form Filler: Form data not found. Check @require links.");
+        return;
+    }
+
+    console.log("WME Form Filler: Data loaded successfully!");
+
+    // 2. Example: Accessing the USA States
+    const usaStates = ffForms.COUNTRIES.USA.states;
+    
+    // 3. Build your UI (Dropdowns, Buttons, etc.)
+    Object.keys(usaStates).forEach(stateAbbr => {
+        const stateData = usaStates[stateAbbr];
+        // Here you would call your function to add these to the WME sidebar
+        console.log(`Setting up forms for ${stateAbbr}:`, Object.keys(stateData));
+    });
 
     selectionSubscription = wmeSDK.Events.on({
         eventName: 'wme-selection-changed',

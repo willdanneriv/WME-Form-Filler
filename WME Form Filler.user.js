@@ -114,8 +114,21 @@
     segmentId: "",
     isReady: false
   };
+  var activeForms = [];
   function main() {
     console.log(`${SCRIPT_NAME}: Functional Logic Active.`);
+    const fetchForm = async (state) => {
+      const url = `https://cdn.jsdelivr.net/gh/willdanneriv/WME-Form-Filler@sdk-migration/forms/USA/${state}.json`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(`[FormFiller] Successfully loaded ${state} configuration.`);
+        activeForms.push(data);
+        console.log("Forms in array:", activeForms.length);
+      } catch (err) {
+        console.error(`[FormFiller] Could not load ${state}:`, err);
+      }
+    };
     selectionSubscription = wmeSDK.Events.on({
       eventName: "wme-selection-changed",
       eventHandler: () => {

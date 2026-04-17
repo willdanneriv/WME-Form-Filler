@@ -9,7 +9,8 @@ const metadata = `// ==UserScript==
 // @include      /^https:\\/\\/(www|beta)\\.waze\\.com\\/(?!user\\/)(.{2,6}\\/)?editor.*$/
 // @license      MIT
 // @grant        none
-// @require      https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js     
+// @require      https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js  
+// @require      https://cdn.jsdelivr.net/gh/willdanneriv/WME-Form-Filler@sdk-migration/forms/forms.js
 // @run-at       document-end
 // ==/UserScript==\n`;
 
