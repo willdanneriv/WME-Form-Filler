@@ -20,6 +20,16 @@ window.ffFormData = {
                     "source": "1803937317",
                     "notes": "1648634142"
                 }
+            },
+            STATES: {
+                "NSW": { name: "New South Wales" },
+                "VIC": { name: "Victoria" },
+                "QLD": { name: "Queensland" },
+                "WA": { name: "Western Australia" },
+                "SA": { name: "South Australia" },
+                "TAS": { name: "Tasmania" },
+                "ACT": { name: "Australian Capital Territory" },
+                "NT": { name: "Northern Territory" }
             }
         },
         USA: {
@@ -40,7 +50,7 @@ window.ffFormData = {
                 }
             },
             VEOC_Closures: {
-                "name": "USA VEOC closures",
+                "name": "USA VEOC Closures",
                 "url": "https://docs.google.com/forms/d/e/1FAIpQLScX8hlXopzXTLEPUpXwdXBWF6qFmz1asKtX5IOy9gbdsfMmTA/viewform",
                 "url_with_keys": "https://docs.google.com/forms/d/e/1FAIpQLScX8hlXopzXTLEPUpXwdXBWF6qFmz1asKtX5IOy9gbdsfMmTA/viewform?entry.1553765347=username&entry.1264424583=CLOSED&entry.1811077109=permalink&entry.792657790=Two-Way&entry.345142186=reason&entry.1102521735=2016-09-20+03:00&entry.2015424420=street+name&entry.1547375393=from+street&entry.1335391716=to+street&entry.1867193205=SC&entry.1714138473=county&entry.1803937317=source&entry.1648634142=notes",
                 "fields": {
@@ -60,7 +70,21 @@ window.ffFormData = {
                 }
             },
             STATES: {
+                AL: { name: "ALABAMA" },
+                AK: { name: "ALASKA" },
+                AZ: { name: "ARIZONA" },
+                AR: { name: "ARKANSAS" },
+                CA: { name: "CALIFORNIA" },
+                CO: { name: "COLORADO" },
+                CT: { name: "CONNECTICUT" },
+                DE: { name: "DELAWARE" },
+                DC: { name: "DISTRICT OF COLUMBIA" },
+                FL: { name: "FLORIDA" },
+                GA: { name: "GEORGIA" },
+                HI: { name: "HAWAII" },
+                ID: { name: "IDAHO" },
                 IL: {
+                    name: "ILLINOIS",
                     IL_Closures: {
                         "name": "IL closures",
                         "url": "https://docs.google.com/forms/d/e/1FAIpQLSff7nsBw8qxCojBdxrjTPl6tercqyyzGy92Vif_SBdHkYDchw/viewform",
@@ -82,7 +106,30 @@ window.ffFormData = {
                         }
                     },
                 },
+                IN: { name: "INDIANA" },
+                IA: { name: "IOWA" },
+                KS: { name: "KANSAS" },
+                KY: { name: "KENTUCKY" },
+                LA: { name: "LOUISIANA" },
+                ME: { name: "MAINE" },
+                MD: { name: "MARYLAND" },
+                MA: { name: "MASSACHUSETTS" },
+                MI: { name: "MICHIGAN" },
+                MN: { name: "MINNESOTA" },
+                MS: { name: "MISSISSIPPI" },
+                MO: { name: "MISSOURI" },
+                MT: { name: "MONTANA" },
+                NE: { name: "NEBRASKA" },
+                NV: { name: "NEVADA" },
+                NH: { name: "NEW HAMPSHIRE" },
+                NJ: { name: "NEW JERSEY" },
+                NM: { name: "NEW MEXICO" },
+                NY: { name: "NEW YORK" },
+                NC: { name: "NORTH CAROLINA" },
+                ND: { name: "NORTH DAKOTA" },
+                OH: { name: "OHIO" },
                 OK: {
+                    name: "OKLAHOMA",
                     OK_Closures: {
                         "name": "OK closures",
                         "url": "https://docs.google.com/forms/d/e/1FAIpQLSd8wouEY6DhA4ifMb_Ub0rEE7X4TCM7WIEqFiT4Lq1hySxEWw/viewform",
@@ -104,11 +151,21 @@ window.ffFormData = {
                         }
                     }
                 },
+                OR: { name: "OREGON" },
+                PA: { name: "PENNSYLVANIA" },
+                RI: { name: "RHODE ISLAND" },
+                SC: { name: "SOUTH CAROLINA" },
+                SD: { name: "SOUTH DAKOTA" },
+                TN: { name: "TENNESSEE" },
+                TX: { name: "TEXAS" },
+                UT: { name: "UTAH" },
+                VT: { name: "VERMONT" },
                 VA: {
+                    name: "VIRGINIA",
                     VA_Closures: {
                         "name": "VA Closures",
                         "url": "https://docs.google.com/forms/d/e/1FAIpQLScwEyNVqiHHdFjc4hr82zlFXW2bAsff9pqIzFUqT8Evh6YROg/viewform",
-                        "url_with_key": "https://docs.google.com/forms/d/e/1FAIpQLScwEyNVqiHHdFjc4hr82zlFXW2bAsff9pqIzFUqT8Evh6YROg/viewform?usp=pp_url&entry.1553765347=kwrigh01&entry.1264424583=CLOSED&entry.1811077109=https://www.waze.com/editor/?env%3Dusa%26lon%3D-79.99979%26lat%3D37.89567%26zoom%3D5%26segments%3D82457306,82457308,82457338&entry.792657790=Two-Way&entry.345142186=Bridge+Work&entry.1102521735=2018-07-01+23:59&entry.2015424420=Morris+Hollow+Rd&entry.1547375393=1st&entry.1335391716=2nd&entry.1867193205=VA&entry.1714138473=Alleghany&entry.1803937317=VDOT&entry.1648634142=Test+Closure",
+                        "url_with_keys": "https://docs.google.com/forms/d/e/1FAIpQLScwEyNVqiHHdFjc4hr82zlFXW2bAsff9pqIzFUqT8Evh6YROg/viewform?usp=pp_url&entry.1553765347=kwrigh01&entry.1264424583=CLOSED&entry.1811077109=https://www.waze.com/editor/?env%3Dusa%26lon%3D-79.99979%26lat%3D37.89567%26zoom%3D5%26segments%3D82457306,82457308,82457338&entry.792657790=Two-Way&entry.345142186=Bridge+Work&entry.1102521735=2018-07-01+23:59&entry.2015424420=Morris+Hollow+Rd&entry.1547375393=1st&entry.1335391716=2nd&entry.1867193205=VA&entry.1714138473=Alleghany&entry.1803937317=VDOT&entry.1648634142=Test+Closure",
                         "fields": {
                             "username": "1553765347",
                             "closureStatus": "1264424583",
@@ -126,7 +183,31 @@ window.ffFormData = {
                         }
                     }
                 },
+                WA: { name: "WASHINGTON" },
+                WV: {
+                    name: "WEST VIRGINIA", WV_Closures: {
+                        "name": "WV Closures",
+                        "url": "https://docs.google.com/forms/d/e/1FAIpQLSd2Stl1DabZRVZ315HT6kdF78e9ysqjItR09pYtE7WiKmPotg/viewform",
+                        "url_with_keys": "https://docs.google.com/forms/d/e/1FAIpQLSd2Stl1DabZRVZ315HT6kdF78e9ysqjItR09pYtE7WiKmPotg/viewform?usp=pp_url&entry.1677745178=user&entry.1292331655=CLOSED&entry.408708691=http://waze.com&entry.52585226=Two-Way&entry.1079033335=reason&entry.1176076628=2020-05-05+05:00&entry.223275032=street&entry.1159260930=from&entry.1582819664=to&entry.2135402288=Monongalia&entry.858860694=source&entry.1440969572=notes",
+                        "fields": {
+                            "username": "1677745178",
+                            "closureStatus": "1292331655",
+                            "permalink": "408708691",
+                            "closedDir": "52585226",
+                            "closedReason": "1079033335",
+                            "endDate": "1176076628",
+                            "streetname": "223275032",
+                            "fromStreet": "1159260930",
+                            "toStreet": "1582819664",
+                            "county": "2135402288",
+                            "source": "858860694",
+                            "notes": "1440969572"
+                        }
+
+                    }
+                },
                 WI: {
+                    name: "WISCONSIN",
                     WI_Closures: {
                         "name": "WI closures",
                         "url": "https://docs.google.com/forms/d/e/1FAIpQLSeiKY0KsO0xN69Asw77MARQFmxOy6zQXF-k2OQdWOfwtiCp7Q/viewform",
@@ -148,28 +229,9 @@ window.ffFormData = {
                         }
                     }
                 },
-                WV: {
-                    WV_Closures: {
-                        "name": "WV Closures",
-                        "url": "https://docs.google.com/forms/d/e/1FAIpQLSd2Stl1DabZRVZ315HT6kdF78e9ysqjItR09pYtE7WiKmPotg/viewform",
-                        "url_with_keys": "https://docs.google.com/forms/d/e/1FAIpQLSd2Stl1DabZRVZ315HT6kdF78e9ysqjItR09pYtE7WiKmPotg/viewform?usp=pp_url&entry.1677745178=user&entry.1292331655=CLOSED&entry.408708691=http://waze.com&entry.52585226=Two-Way&entry.1079033335=reason&entry.1176076628=2020-05-05+05:00&entry.223275032=street&entry.1159260930=from&entry.1582819664=to&entry.2135402288=Monongalia&entry.858860694=source&entry.1440969572=notes",
-                        "fields": {
-                            "username": "1677745178",
-                            "closureStatus": "1292331655",
-                            "permalink": "408708691",
-                            "closedDir": "52585226",
-                            "closedReason": "1079033335",
-                            "endDate": "1176076628",
-                            "streetname": "223275032",
-                            "fromStreet": "1159260930",
-                            "toStreet": "1582819664",
-                            "county": "2135402288",
-                            "source": "858860694",
-                            "notes": "1440969572"
-                        }
-
-                    }
-                }
+                WY: { name: "WYOMING" },
+                PR: { name: "PUERTO RICO" },
+                VI: { name: "VIRGIN ISLANDS (U.S.)" }
             }
         }
     }
